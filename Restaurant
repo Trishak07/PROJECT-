@@ -1,0 +1,105 @@
+import java.util.*;
+public class Restaurant{
+    // Method to print the table slots in well mannered
+    public static void printSlots(String[][] total_tables) {
+            for (int i=0;i<total_tables.length;i++) {
+                for (int j=0;j<total_tables[i].length;j++) {
+                    System.out.print(String.format("%-10s", total_tables[i][j]) + " ");
+                }
+                System.out.println();
+            }
+    }
+
+    // Method 'in' if user enter
+    public static boolean fill(String[][] t, int n, int m, int u) {
+           for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    if (t[i][j].equals("free")) {
+                        System.out.println("table is allocated to you at :\nRow=" + (i + 1) + "\nColumn=" + (j + 1));
+                        t[i][j] = "table" + u;
+                        return true;
+                }
+            }
+        }
+        System.out.println("All the tables are FULL,Can't occupie" + u);
+        return false;
+    }
+
+    public static void out(String[][] t, int n, int m, int u) {
+          for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    if (t[i][j].equals("table" + u)) {
+                        t[i][j] = "free";
+                        return;
+                    }
+                }
+          }
+        
+    }
+
+    public static void main(String[] args) {
+        Scanner s = new Scanner(System.in);
+        
+        System.out.print("Enter the maximum number of rows in your Restaurant : ");
+        int n = s.nextInt();
+        System.out.print("Enter the maximum number of columns in your Restaurant : ");
+        int m = s.nextInt();
+        String[][] total_tables = new String[n][m];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                 total_tables[i][j] = "free";
+            }
+        }
+
+        System.out.println("\n\tEnter 'fill' to occupie a new table");
+        System.out.println("\tEnter 'out.table<number>' to free a table with its number");
+        System.out.println("\tEnter '*display* to see the available tables");
+        System.out.println("\tEnter 'exit' to close the Restaurant");
+        String process = s.next();
+        int tno = 0; // used for naming every new table
+        //below stmt is for storing occupied table data in list format
+        List<Integer> tnolist = new ArrayList<>();
+        while (!process.equals("exit")) {
+            if (process.equals("fill")) {
+                boolean check = fill(total_tables, n , m, tno+1);
+                if (check) {
+                    tno++; // if the table is free, allocated
+                    tnolist.add(tno); // the table name into the record of current filled tables
+                }
+            } else if (process.equals("*display*")) {
+                System.out.println("\n\tDataBase :");
+                printSlots(total_tables);
+            } else if (process.startsWith("out.table")) {
+                String tablenumberStr = process.replace("out.table", "");
+                try {
+                    int tablenumber = Integer.parseInt(tablenumberStr);
+                    // checking if that table number is present or not
+                    if (tnolist.contains(tablenumber)) {
+                        // table is already filled now get removed
+                        tnolist.remove(Integer.valueOf(tablenumber)); // removing that particular table from the list of current filled tables
+                        // pass to the method to make changes in the list
+                        out(total_tables, n, m, tablenumber);
+                        System.out.println("table." + tablenumber + " is emptied successfully");
+                    } else {
+                        // if user tries to emptied the table which is not filled
+                        System.out.println("The table doesn't exist to be emptied");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Enter the correct input");
+                }
+            }
+            process = s.next();
+        }
+        if (!tnolist.isEmpty()) {
+            System.out.print("\tALERT! ");
+            System.out.println("Below table's are yet to emptied");
+            for (Integer table : tnolist) {
+                System.out.println("\ttable(" + table + ")");
+            }
+        }
+        else{
+            System.out.println("The Restaurant is closed successfully");
+        }
+        s.close();
+    }
+}
